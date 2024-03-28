@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+    <!-- Styling for the canvas -->
+    <style>
+        canvas {
+            border: 1px solid #000;
+            /* Black border around the canvas */
+            display: block;
+            /* Display as block element */
+            margin: 0 auto;
+            /* Center the canvas horizontally */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Canvas element for the game -->
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+        // Get the canvas element and its 2D rendering context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ball properties
+        let ballX = canvas.width / 2; // Initial X position of the ball (center of the canvas)
+        let ballY = canvas.height / 2; // Initial Y position of the ball (center of the canvas)
+        const ballRadius = 10; // Radius of the ball
+        let dx = 2; // Horizontal speed of the ball
+        let dy = -2; // Vertical speed of the ball (negative to move upwards)
+
+        // Paddle properties
+        const paddleHeight = 10; // Height of the paddle
+        const paddleWidth = 100; // Width of the paddle
+        let paddleX = (canvas.width - paddleWidth) / 2; // Initial X position of the paddle (centered)
+
+        // Keyboard control states
+        let rightPressed = false; // State of the right arrow key
+        let leftPressed = false; // State of the left arrow key
+
+        // Event listeners for arrow keys
+        document.addEventListener('keydown', keyDownHandler); // Event listener for keydown event
+        document.addEventListener('keyup', keyUpHandler); // Event listener for keyup event
+
+        // Function to handle keydown events
+        function keyDownHandler(e) {
+            // Check if the right arrow key or the left arrow key is pressed
+            if (e.key === 'Right' || e.key === 'ArrowRight') {
+                rightPressed = true; // Set rightPressed to true
+            } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+                leftPressed = true; // Set leftPressed to true
+            }
+        }
+
+        // Function to handle keyup events
+        function keyUpHandler(e) {
+            // Check if the right arrow key or the left arrow key is released
+            if (e.key === 'Right' || e.key === 'ArrowRight') {
+                rightPressed = false; // Set rightPressed to false
+            } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+                leftPressed = false; // Set leftPressed to false
+            }
+        }
+
+        // Function to draw the ball on the canvas
+        function drawBall() {
+            ctx.beginPath(); // Begin drawing a new path
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2); // Draw a circle (the ball)
+            ctx.fillStyle = '#0095DD'; // Set the fill color to blue
+            ctx.fill(); // Fill the circle with the specified color
+            ctx.closePath(); // Close the path
+        }
+
+        // Function to draw the paddle on the canvas
+        function drawPaddle() {
+            ctx.beginPath(); // Begin drawing a new path
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); // Draw a rectangle (the paddle)
+            ctx.fillStyle = '#0095DD'; // Set the fill color to blue
+            ctx.fill(); // Fill the rectangle with the specified color
+            ctx.closePath(); // Close the path
+        }
+
+        // Function to update the position of the ball
+        function updateBallPosition() {
+            // Move the ball horizontally and vertically based on its speed
+            ballX += dx; // Increment the X position by the horizontal speed
+            ballY += dy; // Increment the Y position by the vertical speed
+
+            // Check if the ball collides with the walls of the canvas
+            if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+                dx = -dx; // Reverse the horizontal speed to change the direction
+            }
+            // Check if the ball collides with the top wall of the canvas
+            if (ballY + dy < ballRadius) {
+                dy = -dy; // Reverse the vertical speed to change the direction
+            } else if (ballY + dy > canvas.height - ballRadius) {
+                // Check if the ball collides with the paddle
+                if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+                    dy = -dy; // Reverse the vertical speed to change the direction
+                } else {
+                    // Game over if the ball misses the paddle
+                    alert('Game Over!'); // Display an alert message
+                    document.location.reload(); // Reload the page to restart the game
+                }
+            }
+        }
+
+        // Function to update the position of the paddle
+        function updatePaddlePosition() {
+            // Move the paddle based on the pressed arrow keys
+            if (rightPressed && paddleX < canvas.width - paddleWidth) {
+                paddleX += 7; // Increment the X position to move the paddle right
+            } else if (leftPressed && paddleX > 0) {
+                paddleX -= 7; // Decrement the X position to move the paddle left
+            }
+        }
+
+        // Function to clear the canvas
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
+        }
+
+        // Function to run the game loop
+        function gameLoop() {
+            clearCanvas(); // Clear the canvas before drawing new frames
+            drawBall(); // Draw the ball on the canvas
+            drawPaddle(); // Draw the paddle on the canvas
+            updateBallPosition(); // Update the position of the ball
+            updatePaddlePosition(); // Update the position of the paddle
+            requestAnimationFrame(gameLoop); // Request the next animation frame to continue the game loop
+        }
+
+        // Start the game loop when the page loads
+        gameLoop(); // Call the gameLoop function to start the game
+
+    </script>
+</body>
+
+</html>
